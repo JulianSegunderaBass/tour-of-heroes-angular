@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Hero } from '../hero.interface';
-import { HEROES } from '../mock-heroes';
+import { HeroService } from '../hero.service';
+import { MessageService } from '../message.service';
 
 @Component({
   selector: 'app-heroes',
@@ -15,14 +16,7 @@ import { HEROES } from '../mock-heroes';
         <span class="badge">{{hero.id}}</span> {{hero.name}}
       </li>
     </ul>
-    <div *ngIf="selectedHero">
-      <h2>{{selectedHero.name | uppercase}} Details</h2>
-      <div><span>id: </span>{{selectedHero.id}}</div>
-      <div>
-        <label for="hero-name">Hero name: </label>
-        <input id="hero-name" [(ngModel)]="selectedHero.name" placeholder="name">
-      </div>
-    </div>
+    <app-hero-detail [hero]="selectedHero"></app-hero-detail>
   `,
   styles: [`
     /* HeroesComponent's private CSS styles */
@@ -80,14 +74,24 @@ import { HEROES } from '../mock-heroes';
 })
 export class HeroesComponent implements OnInit {
   selectedHero?: Hero;
-  heroes: Hero[] = HEROES;
+  heroes: Hero[] = [];
   
-  constructor() {}
+  constructor(
+    private heroService: HeroService, 
+    private messageService: MessageService
+  ) {}
+
+  getHeroes(): void {
+    this.heroService.getHeroes()
+        .subscribe(heroes => this.heroes = heroes);
+  }
 
   onSelect(hero: Hero): void {
     this.selectedHero = hero;
+    this.messageService.add(`HeroesComponent: Selected hero id=${hero.id}`);
   }
 
   ngOnInit(): void {
+    this.getHeroes();
   }
 }
