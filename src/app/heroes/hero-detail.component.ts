@@ -1,5 +1,8 @@
 import { Component, OnInit, Input } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { Location } from '@angular/common';
 import { Hero } from '../hero.interface';
+import { HeroService } from '../hero.service';
 
 @Component({
   selector: 'app-hero-detail',
@@ -12,16 +15,55 @@ import { Hero } from '../hero.interface';
         <input id="hero-name" [(ngModel)]="hero.name" placeholder="name">
       </div>
     </div>
+    <button (click)="goBack()">go back</button>
   `,
   styles: [`
-    
+    /* HeroDetailComponent's private CSS styles */
+    label {
+      color: #435960;
+      font-weight: bold;
+    }
+    input {
+      font-size: 1em;
+      padding: .5rem;
+    }
+    button {
+      margin-top: 20px;
+      background-color: #eee;
+      padding: 1rem;
+      border-radius: 4px;
+      font-size: 1rem;
+    }
+    button:hover {
+      background-color: #cfd8dc;
+    }
+    button:disabled {
+      background-color: #eee;
+      color: #ccc;
+      cursor: auto;
+    }
   `]
 })
 export class HeroDetailComponent implements OnInit {
-  @Input() hero?: Hero;
+  hero?: Hero;
   
-  constructor() {}
+  constructor(
+    private route: ActivatedRoute,
+    private heroService: HeroService,
+    private location: Location
+  ) {}
 
   ngOnInit(): void {
+    this.getHero();
+  }
+  
+  getHero(): void {
+    const id = Number(this.route.snapshot.paramMap.get('id'));
+    this.heroService.getHero(id)
+      .subscribe(hero => this.hero = hero);
+  }
+
+  goBack(): void {
+    this.location.back();
   }
 }
